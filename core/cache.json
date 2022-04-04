@@ -1,0 +1,11 @@
+{
+    "host": "",
+    "user": "",
+    "password": "",
+    "proxy": 0,
+    "install_location": "",
+    "data_folder": "",
+    "vtt_folder": "",
+    "exclude_folder": "",
+    "last_backup": ""
+}
