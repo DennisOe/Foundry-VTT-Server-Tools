@@ -6,6 +6,6 @@
     "install_location": "",
     "data_folder": "",
     "vtt_folder": "",
-    "exclude_folder": "",
+    "exclude_folders": "",
     "last_backup": ""
 }
