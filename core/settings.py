@@ -1,28 +1,20 @@
+import os
 import json
 
 
 class Settings:
     """This class holds all necessary custom user information."""
-    # Server information
-    host = ""
-    user = ""
-    password = ""
-    # Foundry information
-    proxy = 0
-    data_folder = ""
-    vtt_folder = ""
-    exclude_folders = []
-    # Misc information
-    last_backup = ""
+    def __init__(self):
+        self.cache_file = os.path.dirname(os.path.realpath(__file__)) + "/cache.json"
+        self.settings = self.read()
 
+    def write(self):
+        """Edit json file."""
+        with open(self.cache_file, "w") as outfile:
+            json.dump(self.settings, outfile, indent=4)
 
-class EditSettings:
-    @staticmethod
-    def write():
-        with open("cache.json", "w") as outfile:
-            json.dump(cached_settings, outfile, indent=4)
-    @staticmethod
-    def read():
-        with open('cache.json') as json_file:
-            data = json.load(json_file)
-            print(data)
+    def read(self) -> dict:
+        """Read json file."""
+        with open(self.cache_file) as json_file:
+            cache_data = json.load(json_file)
+            return cache_data
