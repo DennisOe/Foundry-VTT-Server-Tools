@@ -9,6 +9,7 @@ class Server(Settings):
         super().__init__()
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        self.sftp = None
 
     def ssh_connect(self, state: bool):
         """Connect or disconnect ssh."""
@@ -37,6 +38,19 @@ class Server(Settings):
             outlines = stdout.readlines()
             output = "".join(outlines)
             return output
+
+    def sftp_connect(self, state: bool):
+        if state:
+            self.sftp = self.ssh.open_sftp()
+        else:
+            if self.sftp is not None:
+                self.sftp.close()
+
+    def sftp_download(self, path: dict):
+        self.sftp.get(path["remote"], path["local"])
+
+    def delete_file(self, path: str):
+        self.ssh_command("rm {file}".format(file=path))
 
     def ping(self) -> bool:
         """Check if server is online."""

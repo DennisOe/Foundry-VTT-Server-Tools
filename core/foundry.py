@@ -3,8 +3,8 @@ from datetime import datetime
 
 
 class Foundry(Server):
-    def status(self) -> str:
-        return self.ssh_command("pm2 list")
+    def status(self) -> bool:
+        return True if "online" in self.ssh_command("pm2 list") else False
 
     def start(self) -> bool:
         self.ssh_command("pm2 start "
@@ -29,9 +29,10 @@ class Foundry(Server):
         self.write()
 
     def download(self):
-        pass
+        remote_local_path = {"remote": "{install_location}/backup_{last_backup}.tar.gz".format_map(self.settings),
+                             "local": "{download_folder}/backup_{last_backup}.tar.gz".format_map(self.settings)}
+        self.sftp_connect(state=True)
+        self.sftp_download(path=remote_local_path)
+        self.sftp_connect(state=False)
+        self.delete_file(remote_local_path["remote"])
 
-
-f = Foundry()
-f.ssh_connect(True)
-f.backup()
