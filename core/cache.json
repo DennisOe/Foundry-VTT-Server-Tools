@@ -2,10 +2,11 @@
     "host": "",
     "user": "",
     "password": "",
-    "proxy": 0,
+    "proxy": 30000,
     "install_location": "",
-    "data_folder": "",
-    "vtt_folder": "",
-    "exclude_folders": "",
+    "vtt_name": "",
+    "vtt_folder": "foundryvtt",
+    "data_folder": "foundrydata",
+    "download_folder": "",
     "last_backup": ""
 }
