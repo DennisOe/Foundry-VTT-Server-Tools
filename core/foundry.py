@@ -36,3 +36,41 @@ class Foundry(Server):
         self.sftp_connect(state=False)
         self.delete_file(remote_local_path["remote"])
 
+
+def main():
+    print("Foundry-VTT-Server-Tools")
+    f = Foundry()
+    f.ssh_connect(True)
+    print("Connected...")
+    commands = "Commands: \"status\", \"start\", \"shutdown\", \"restart\", \"backup\", \"download\", \"backup " \
+               "download\", \"exit\", \"help\""
+    print(commands)
+    cli = True
+    while cli:
+        cli = input()
+        if cli.lower() == "exit":
+            cli = False
+        elif cli.lower() == "status":
+            print("Foundry is ONLINE." if f.status() else "Foundry is OFFLINE.")
+        elif cli.lower() == "start":
+            f.start()
+        elif cli.lower() == "shutdown":
+            f.shutdown()
+        elif cli.lower() == "restart":
+            f.restart()
+        elif cli.lower() == "backup":
+            f.backup()
+        elif cli.lower() == "download":
+            f.download()
+        elif cli.lower() == "backup download":
+            f.backup()
+            f.download()
+        else:
+            print(commands)
+    else:
+        f.ssh_connect(False)
+        print("Disconnected...")
+
+
+if __name__ == "__main__":
+    main()
