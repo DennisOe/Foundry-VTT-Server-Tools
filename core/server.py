@@ -47,7 +47,10 @@ class Server(Settings):
                 self.sftp.close()
 
     def sftp_download(self, path: dict):
-        self.sftp.get(path["remote"], path["local"])
+        try:
+            self.sftp.get(path["remote"], path["local"])
+        except IOError:
+            return False
 
     def delete_file(self, path: str):
         self.ssh_command("rm {file}".format(file=path))
