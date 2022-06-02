@@ -24,7 +24,9 @@ class Foundry(Server):
     def backup(self):
         date = datetime.today().strftime("%Y-%m-%d")
         backup_folders = " ".join([self.settings["vtt_folder"], self.settings["data_folder"]])
+        self.shutdown()
         self.ssh_command(f"tar -czf backup_{date}.tar.gz {backup_folders}")
+        self.start()
         self.settings["last_backup"] = date
         self.write()
 
@@ -39,37 +41,53 @@ class Foundry(Server):
 
 def main():
     print("Foundry-VTT-Server-Tools")
-    f = Foundry()
-    f.ssh_connect(True)
-    print("Connected...")
-    commands = "Commands: \"status\", \"start\", \"shutdown\", \"restart\", \"backup\", \"download\", \"backup " \
-               "download\", \"exit\", \"help\""
+    foundry = Foundry()
+    foundry.ssh_connect(True)
+    print("Connected to... {host}".format_map(foundry.settings))
+    commands = "Commands: status, start, shutdown, restart, backup+download, backup, download, settings, quit, help"
     print(commands)
     cli = True
     while cli:
-        cli = input()
-        if cli.lower() == "exit":
+        cli = input(">> ")
+        if cli.lower() in ["quit", "q", "exit", "e"]:
             cli = False
-        elif cli.lower() == "status":
-            print("Foundry is ONLINE." if f.status() else "Foundry is OFFLINE.")
-        elif cli.lower() == "start":
-            f.start()
-        elif cli.lower() == "shutdown":
-            f.shutdown()
-        elif cli.lower() == "restart":
-            f.restart()
-        elif cli.lower() == "backup":
-            f.backup()
-        elif cli.lower() == "download":
-            f.download()
-        elif cli.lower() == "backup download":
-            f.backup()
-            f.download()
+        elif cli.lower() in ["status", ]:
+            print("Foundry is ONLINE." if foundry.status() else "Foundry is OFFLINE.")
+        elif cli.lower() in ["start", ]:
+            foundry.start()
+            print("Foundry is started." if foundry.status() else "Foundry is shutdown.")
+        elif cli.lower() in ["shutdown", ]:
+            foundry.shutdown()
+            print("Foundry is started." if foundry.status() else "Foundry is shutdown.")
+        elif cli.lower() in ["restart", "re"]:
+            foundry.restart()
+            print("Foundry is restarted." if foundry.status() else "Restart failed.")
+        elif cli.lower() in ["backup", ]:
+            foundry.backup()
+        elif cli.lower() in ["download", ]:
+            foundry.download()
+        elif cli.lower() in ["backup+download", "bd"]:
+            foundry.backup()
+            foundry.download()
+        elif cli.lower() in ["settings", ]:
+            print("Edit settings:", ", ".join(foundry.settings.keys()))
+        elif cli.lower() in ["host", "user", "password", "proxy", "install_location", "vtt_name", "vtt_folder",
+                             "data_folder", "download_folder", "last_backup"]:
+            if cli.lower() in foundry.settings.keys():
+                setting_key = cli.lower()
+                print(foundry.settings[setting_key])
+                cli = input("Edit settings? y/n?\n>> ")
+                if cli.lower() in ["yes", "y"]:
+                    foundry.settings[setting_key] = input(">> ")
+                    foundry.write()
+        elif cli == "":
+            cli = True
+            print(commands)
         else:
             print(commands)
     else:
-        f.ssh_connect(False)
-        print("Disconnected...")
+        foundry.ssh_connect(False)
+        print("Disconnected from... {host}".format_map(foundry.settings))
 
 
 if __name__ == "__main__":
