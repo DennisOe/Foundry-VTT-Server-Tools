@@ -43,7 +43,7 @@ def main():
     print("Foundry-VTT-Server-Tools")
     foundry = Foundry()
     foundry.ssh_connect(True)
-    print("Connected to... {host}".format_map(foundry.settings))
+    print(f"Connected to... {foundry.settings['host']}")
     commands = "Commands: status, start, shutdown, restart, backup+download, backup, download, settings, quit, help"
     print(commands)
     cli = True
@@ -87,7 +87,7 @@ def main():
             print(commands)
     else:
         foundry.ssh_connect(False)
-        print("Disconnected from... {host}".format_map(foundry.settings))
+        print(f"Disconnected from... {foundry.settings['host']}")
 
 
 if __name__ == "__main__":
