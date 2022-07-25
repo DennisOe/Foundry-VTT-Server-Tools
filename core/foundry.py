@@ -17,7 +17,7 @@ class Foundry(Server):
         self.ssh_command("pm2 delete foundry-server")
         return False
 
-    def restart(self) -> True:
+    def restart(self) -> bool:
         self.ssh_command("pm2 restart foundry-server")
         return True
 
