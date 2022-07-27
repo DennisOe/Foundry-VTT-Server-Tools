@@ -53,7 +53,7 @@ class Server(Settings):
             return False
 
     def delete_file(self, path: str):
-        self.ssh_command("rm {file}".format(file=path))
+        self.ssh_command(f"rm {path}")
 
     def ping(self) -> bool:
         """Check if server is online."""
