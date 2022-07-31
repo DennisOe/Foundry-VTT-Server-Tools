@@ -11,23 +11,21 @@ class Server(Settings):
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.sftp = None
 
-    def ssh_connect(self, state: bool):
+    def ssh_connect(self):
         """Connect or disconnect ssh."""
-        if state:
-            if self.ping():
-                if not self.ssh_activ():
-                    self.ssh.connect(self.settings["host"], 22, self.settings["user"], self.settings["password"])
-        else:
-            if self.ssh_activ():
-                self.ssh.close()
+        if not self.ping():
+            return
+        if not self.ssh_activ():
+            self.ssh.connect(self.settings["host"], 22, self.settings["user"], self.settings["password"])
+        elif self.ssh_activ():
+            self.ssh.close()
 
     def ssh_activ(self) -> bool:
         """Check if ssh connection is established."""
-        if self.ssh.get_transport() is not None:
-            if self.ssh.get_transport().is_active():
-                return True
-            else:
-                return False
+        if self.ssh.get_transport() is None:
+            return False
+        elif self.ssh.get_transport().is_active():
+            return True
         else:
             return False
 
@@ -39,12 +37,11 @@ class Server(Settings):
             output = "".join(outlines)
             return output
 
-    def sftp_connect(self, state: bool):
-        if state:
+    def sftp_connect(self):
+        if self.sftp is None:
             self.sftp = self.ssh.open_sftp()
         else:
-            if self.sftp is not None:
-                self.sftp.close()
+            self.sftp.close()
 
     def sftp_download(self, path: dict):
         try:
