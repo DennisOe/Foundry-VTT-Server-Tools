@@ -54,16 +54,16 @@ class CliHandler(Foundry):
                               "install_location", "vtt_name", "vtt_folder",
                               "data_folder", "download_folder", "last_backup"): self.edit_settings, }
 
-    def print_commands(self, *argv: [int]):
+    def print_commands(self, *argv: list[int]):
         print("Commands:\n", ", ".join([", ".join(e) for e in self.cli_commands.keys()]))
 
-    def quit_cli(self, *argv: [int]):
+    def quit_cli(self, *argv: list[int]):
         self.cli = False
 
-    def server_info(self, *argv: [int]):
+    def server_info(self, *argv: list[int]):
         print("Foundry is ONLINE." if self.status() else "Foundry is OFFLINE.")
 
-    def server_state(self, *argv: [int]):
+    def server_state(self, *argv: list[int]):
         if not argv[0]:
             self.start()
             print("Foundry is started." if self.status() else "Foundry is shutdown.")
@@ -74,7 +74,7 @@ class CliHandler(Foundry):
             self.restart()
             print("Foundry is restarted." if self.status() else "Restart failed.")
 
-    def file_handling(self, *argv: [int]):
+    def file_handling(self, *argv: list[int]):
         if not argv[0]:
             self.backup()
         elif argv[0] == 1:
@@ -83,7 +83,7 @@ class CliHandler(Foundry):
             self.backup()
             self.download()
 
-    def edit_settings(self, *argv: [int]):
+    def edit_settings(self, *argv: list[int]):
         if not argv[0]:
             print("Edit settings:", ", ".join(self.settings.keys()))
         elif argv[0] >= 1:
