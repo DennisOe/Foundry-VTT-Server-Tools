@@ -22,18 +22,18 @@ class Foundry(Server):
         self.ssh_command("pm2 restart foundry-server")
         return True
 
-    def backup(self):
-        date = datetime.today().strftime("%Y-%m-%d")
-        backup_folders = " ".join([self.settings["vtt_folder"], self.settings["data_folder"]])
+    def backup(self) -> None:
+        date: datetime = datetime.today().strftime("%Y-%m-%d") #TODO
+        backup_folders: str = " ".join([self.settings["vtt_folder"], self.settings["data_folder"]])
         self.shutdown()
         self.ssh_command(f"tar -czf backup_{date}.tar.gz {backup_folders}")
         self.start()
         self.settings["last_backup"] = date
         self.write()
 
-    def download(self):
-        remote_local_path = {"remote": "{install_location}/backup_{last_backup}.tar.gz".format_map(self.settings),
-                             "local": "{download_folder}/backup_{last_backup}.tar.gz".format_map(self.settings)}
+    def download(self) -> None:
+        remote_local_path: dict[str, str] = {"remote": "{install_location}/backup_{last_backup}.tar.gz".format_map(self.settings),
+                                             "local": "{download_folder}/backup_{last_backup}.tar.gz".format_map(self.settings)}
         self.sftp_connect()
         self.sftp_download(path=remote_local_path)
         self.sftp_connect()
@@ -42,7 +42,7 @@ class Foundry(Server):
 
 class CliHandler(Foundry):
     """CliHandler manages all user inputs."""
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.cli = True
         self.cli_commands = {("help", "h"): self.print_commands,
@@ -54,53 +54,54 @@ class CliHandler(Foundry):
                               "install_location", "vtt_name", "vtt_folder",
                               "data_folder", "download_folder", "last_backup"): self.edit_settings, }
 
-    def print_commands(self, *argv: list[int]):
+    def print_commands(self, argv: int) -> None:
         print("Commands:\n", ", ".join([", ".join(e) for e in self.cli_commands.keys()]))
 
-    def quit_cli(self, *argv: list[int]):
+    def quit_cli(self, argv: int) -> None:
         self.cli = False
 
-    def server_info(self, *argv: list[int]):
+    def server_info(self, argv: int) -> None:
         print("Foundry is ONLINE." if self.status() else "Foundry is OFFLINE.")
 
-    def server_state(self, *argv: list[int]):
-        if not argv[0]:
+    def server_state(self, argv: int) -> None:
+        if not argv:
             self.start()
             print("Foundry is started." if self.status() else "Foundry is shutdown.")
-        elif argv[0] == 1:
+        elif argv == 1:
             self.shutdown()
             print("Foundry is started." if self.status() else "Foundry is shutdown.")
-        elif argv[0] == 2:
+        elif argv == 2:
             self.restart()
             print("Foundry is restarted." if self.status() else "Restart failed.")
 
-    def file_handling(self, *argv: list[int]):
-        if not argv[0]:
+    def file_handling(self, argv: int) -> None:
+        if not argv:
             self.backup()
-        elif argv[0] == 1:
+        elif argv == 1:
             self.download()
-        elif argv[0] in [2, 3]:
+        elif argv in [2, 3]:
             self.backup()
             self.download()
 
-    def edit_settings(self, *argv: list[int]):
-        if not argv[0]:
+    def edit_settings(self, argv: int) -> None:
+        if not argv:
             print("Edit settings:", ", ".join(self.settings.keys()))
-        elif argv[0] >= 1:
+        elif argv >= 1:
             self.cli = input("Edit settings? y/n?\n>> ")
             if self.cli.lower() in ["yes", "y"]:
-                self.settings[list(self.cli_commands.keys())[5][argv[0]]] = input(">> ")
+                setting_keys: str = list(self.cli_commands.keys())[5][argv]
+                self.settings[setting_keys] = input(f"Change: {setting_keys}\n>> ")
                 self.write()
 
 
-def main():
+def main() -> None:
     print("Foundry-VTT-Server-Tools")
-    cli_handler = CliHandler()
+    cli_handler: CliHandler = CliHandler()
     cli_handler.ssh_connect()
     print(f"Connected to... {cli_handler.settings['host']}")
-    cli_handler.print_commands()
+    cli_handler.print_commands(0)
     while cli_handler.cli:
-        cli_handler.cli = input(">> ")
+        cli_handler.cli: str = input(">> ")
         for commands in cli_handler.cli_commands.keys():
             if cli_handler.cli in commands:
                 # cli_handler.cli -> user input ie. "status"
