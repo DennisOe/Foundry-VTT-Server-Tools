@@ -1,17 +1,17 @@
 import os
-import paramiko
+from paramiko import SSHClient, AutoAddPolicy
 from settings import Settings
 
 
 class Server(Settings):
     """This class manages interaction with remote server."""
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.ssh = paramiko.SSHClient()
-        self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        self.ssh: SSHClient = SSHClient()
+        self.ssh.set_missing_host_key_policy(AutoAddPolicy())
         self.sftp = None
 
-    def ssh_connect(self):
+    def ssh_connect(self) -> None:
         """Connect or disconnect ssh."""
         if not self.ping():
             return
@@ -33,23 +33,23 @@ class Server(Settings):
         """Issues bash commands."""
         if self.ssh_activ():
             stdin, stdout, stderr = self.ssh.exec_command(command)
-            outlines = stdout.readlines()
-            output = "".join(outlines)
+            outlines: list[str] = stdout.readlines()
+            output: str = "".join(outlines)
             return output
 
-    def sftp_connect(self):
+    def sftp_connect(self) -> None:
         if self.sftp is None:
             self.sftp = self.ssh.open_sftp()
         else:
             self.sftp.close()
 
-    def sftp_download(self, path: dict):
+    def sftp_download(self, path: dict) -> None:
         try:
             self.sftp.get(path["remote"], path["local"])
         except IOError:
             return False
 
-    def delete_file(self, path: str):
+    def delete_file(self, path: str) -> None:
         self.ssh_command(f"rm {path}")
 
     def ping(self) -> bool:
