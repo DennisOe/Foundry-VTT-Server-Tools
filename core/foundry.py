@@ -58,7 +58,7 @@ class CliHandler(Foundry):
         print("Commands:\n", ", ".join([", ".join(e) for e in self.cli_commands.keys()]))
 
     def quit_cli(self, argv: int) -> None:
-        self.cli = False
+        self.cli: bool | str = False
 
     def server_info(self, argv: int) -> None:
         print("Foundry is ONLINE." if self.status() else "Foundry is OFFLINE.")
