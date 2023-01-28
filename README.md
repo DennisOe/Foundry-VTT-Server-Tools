@@ -5,6 +5,10 @@ Requirements:
 * Python 3.11
 * paramiko
 
+Run Server Tools from Terminal:
+```
+python foundry.py
+```
 You also need to edit the cache.json file.
 
 * host: server ip address
